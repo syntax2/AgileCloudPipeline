@@ -1,0 +1,23 @@
+pipeline {
+  agent any
+
+  environment {
+    DOCKER_IMAGE = "ashishkadian/app:tagname"
+    SSH_PRIVATE_KEY = credentials('pop.pem')
+    EC2_USERNAME = 'ubuntu'
+    EC2_HOST = 'ec2-instance-ip'
+  }
+
+  stages {
+    stage('Deploy') {
+      steps {
+        sshagent(['pop.pem']) {
+          sh '''
+            ssh -o StrictHostKeyChecking=no -i ${SSH_PRIVATE_KEY} ${EC2_USERNAME}@${EC2_HOST} 'docker pull ${DOCKER_IMAGE}'
+            ssh -o StrictHostKeyChecking=no -i ${SSH_PRIVATE_KEY} ${EC2_USERNAME}@${EC2_HOST} 'docker run -d --name my-app -p 80:3000 ${DOCKER_IMAGE}'
+          '''
+        }
+      }
+    }
+  }
+}
