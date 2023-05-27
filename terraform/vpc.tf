@@ -9,5 +9,8 @@ module "vpc" {
     enable_dns_hostnames = true
     enable_vpn_gateway = true
     enable_nat_gateway = true
-    
+
+    tags = {
+        terraform = "true"
+    }
 }
